@@ -1,17 +1,27 @@
 const getParams = require('./lib/args').getParams;
 const getCommands = require('./lib/args').getCommands;
-const CommandNotFound = require('./lib/errors').COMMAND_NOT_FOUND;
+const Logs = require('./lib/logs');
+const create = require('./commands/create');
 
 module.exports = () => {
     const args = process.argv.splice(2);
 
     const params = getParams(args);
-    const commands = getCommands(args);
+    let commands = getCommands(args);
 
-    if (commands[0] === 'create') {
-        console.error(`Criando um ${args[1]} de nome ${args[2]} do tipo ${params.type || 'classe'} ${params.spec === 'true' ? 'com' : 'sem'} arquivo de testes`)
-    } else {
-        throw CommandNotFound();
+    switch (commands[0]) {
+        case 'create':
+            commands = commands.splice(1);
+            create(commands, params);
+            break;
+        case 'init':
+            console.log('Creating config file ...');
+            break;
+        case 'help':
+            console.log('Printing Help Info');
+            break;
+        default:
+            console.log(Logs.defaultLog)
     }
 
 }
