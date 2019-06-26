@@ -1,5 +1,6 @@
 const getParams = require('./lib/args').getParams;
 const getCommands = require('./lib/args').getCommands;
+const CommandNotFound = require('./lib/errors').COMMAND_NOT_FOUND;
 
 module.exports = () => {
     const args = process.argv.splice(2);
@@ -9,6 +10,8 @@ module.exports = () => {
 
     if (commands[0] === 'create') {
         console.error(`Criando um ${args[1]} de nome ${args[2]} do tipo ${params.type || 'classe'} ${params.spec === 'true' ? 'com' : 'sem'} arquivo de testes`)
+    } else {
+        throw CommandNotFound();
     }
 
 }
