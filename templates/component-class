@@ -1,0 +1,18 @@
+// global
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+class Alerts extends Component {
+
+    state = {}
+
+    render() {
+        <div>i'm a class component</div>
+    }
+
+}
+
+Alerts.propTypes = {
+};
+
+export default Alerts;
