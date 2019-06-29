@@ -6,11 +6,13 @@ module.exports = (commands, params) => {
 
     let foldersPath = path.slice(0, path.length - 1).join('/');    
     
-    mkdir_p(foldersPath);
+    mkdir_p(foldersPath, () => {
 
-    const template = fs.readFileSync(__dirname + '/../templates/component-class').toString();
+        const template = fs.readFileSync(__dirname + '/../templates/component-class').toString();
 
-    fs.writeFile(commands[0], template, err => console.log(err))
+        fs.writeFile(process.cwd() + '/' + commands[0], template, err => console.log(err))
+
+    });
 
 }
 
@@ -22,7 +24,8 @@ module.exports = (commands, params) => {
  * Asynchronous operation. No arguments other than a possible exception
  * are given to the completion callback.
  */
-function mkdir_p(path, mode = 0777, callback, position = 0) {
+function mkdir_p(path, callback, mode = 0777, position = 0) {
+    if (path[0] === '/') path = path.slice(1, path.length);
     parts = require('path').normalize(path).split('/');
 
     if (position >= parts.length) {
