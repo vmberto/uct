@@ -2,17 +2,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-class Alerts extends Component {
+class <$ComponentName$> extends Component {
 
     state = {}
 
     render() {
-        <div>i'm a class component</div>
+        return (
+            <div>i'm a class component</div>
+        )
     }
 
 }
 
-Alerts.propTypes = {
-};
+<$ComponentName$>.propTypes = {};
 
-export default Alerts;
+export default <$ComponentName$>;

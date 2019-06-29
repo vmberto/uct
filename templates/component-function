@@ -1,0 +1,17 @@
+// global
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+const <$ComponentName$> = props => {
+
+    return (
+        return (
+            <div>i'm a function component</div>
+        )
+    );
+
+};
+
+<$ComponentName$>.propTypes = {};
+
+export default <$ComponentName$>

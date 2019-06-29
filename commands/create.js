@@ -1,57 +1,33 @@
 const fs = require('fs');
+const { rootPath, mkdir_p, isJavascriptFile } = require('../lib/utils');
+const templateParser = require('../lib/template-parser');
 
 module.exports = (commands, params) => {
 
-    let path = commands[0].split('/');
+    /** @refactor this commands array, maybe change to an object */
+    let fullPathStr = commands[0];
+    let fullPathArr = commands[0].split('/');
+    let fileName = fullPathArr[fullPathArr.length - 1];
 
-    let foldersPath = path.slice(0, path.length - 1).join('/');    
-    
+    let foldersPath = fullPathArr.slice(0, fullPathArr.length - 1).join('/');
+
     mkdir_p(foldersPath, () => {
+        
+        let template = fs.readFileSync(rootPath() + '/templates/component-class').toString();
 
-        const template = fs.readFileSync(__dirname + '/../templates/component-class').toString();
+        /** @byDefault the file created is capitalized, could be changed in uct's config file */
+        template = templateParser(template, { ComponentName: capitalize(fileName) });
 
-        fs.writeFile(process.cwd() + '/' + commands[0], template, err => console.log(err))
+        if (!isJavascriptFile(fullPathStr)) fullPathStr = fullPathStr + '.js';
+
+        fs.writeFile(process.cwd() + '/' + fullPathStr, template, err => console.log(err));
 
     });
 
 }
 
-/**
- * @from https://brunopedro.com/2010/12/15/recursive-directory-nodejs/
- * 
- * Offers functionality similar to mkdir -p
- *
- * Asynchronous operation. No arguments other than a possible exception
- * are given to the completion callback.
- */
-function mkdir_p(path, callback, mode = 0777, position = 0) {
-    if (path[0] === '/') path = path.slice(1, path.length);
-    parts = require('path').normalize(path).split('/');
-
-    if (position >= parts.length) {
-        if (callback) {
-            return callback();
-        } else {
-            return true;
-        }
-    }
-
-    var directory = parts.slice(0, position + 1).join('/');
-    fs.stat(directory, function(err) {
-        if (err === null) {
-            mkdir_p(path, mode, callback, position + 1);
-        } else {
-            fs.mkdir(directory, mode, function (err) {
-                if (err) {
-                    if (callback) {
-                        return callback(err);
-                    } else {
-                        throw err;
-                    }
-                } else {
-                    mkdir_p(path, mode, callback, position + 1);
-                }
-            })
-        }
-    })
-}
+const capitalize = (s) => {
+    if (typeof s !== 'string') return ''
+    return s.charAt(0).toUpperCase() + s.slice(1)
+  }
+  
