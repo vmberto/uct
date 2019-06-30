@@ -2,6 +2,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+// css
+import './<$ComponentName$>.css'
+
 class <$ComponentName$> extends Component {
 
     state = {}

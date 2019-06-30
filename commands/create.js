@@ -1,33 +1,83 @@
 const fs = require('fs');
-const { rootPath, mkdir_p, isJavascriptFile } = require('../lib/utils');
+const { rootPath, mkdir_p, hasJavascriptExtension } = require('../lib/utils');
 const templateParser = require('../lib/template-parser');
 
 module.exports = (commands, params) => {
 
-    /** @refactor this commands array, maybe change to an object */
-    let fullPathStr = commands[0];
-    let fullPathArr = commands[0].split('/');
-    let fileName = fullPathArr[fullPathArr.length - 1];
+    if (hasJavascriptExtension(commands[0])) commands[0] = commands[0].split('.js').join('');
+    const FILE_PATH = commands[0];
+    const FILES = [];
 
-    let foldersPath = fullPathArr.slice(0, fullPathArr.length - 1).join('/');
 
-    mkdir_p(foldersPath, () => {
-        
-        let template = fs.readFileSync(rootPath() + '/templates/component-class').toString();
+    let fullPathArr = FILE_PATH.split('/');
+    /** @byDefault the file created is capitalized, could be changed in uct's config file */
+    let fileName = treatFileName(fullPathArr[fullPathArr.length - 1]);
+    fullPathArr[fullPathArr.length - 1] = fileName;
+    let fullPathStr = fullPathArr.join('/');
 
-        /** @byDefault the file created is capitalized, could be changed in uct's config file */
-        template = templateParser(template, { ComponentName: capitalize(fileName) });
 
-        if (!isJavascriptFile(fullPathStr)) fullPathStr = fullPathStr + '.js';
+    mkdir_p(fullPathStr, () => {
 
-        fs.writeFile(process.cwd() + '/' + fullPathStr, template, err => console.log(err));
+        getFilesToBeCreated(fileName, {}, params).forEach(f => {
+            FILES.unshift({ ...f, path: `${process.cwd()}/${fullPathStr}/${fileName}${f.extension}` });
+        });
+
+        FILES.forEach(file => {
+            fs.writeFile(file.path, file.template, err => console.log("\x1b[32m", `✓ ${file.title} file successfully created!`));
+        });
 
     });
 
 }
 
-const capitalize = (s) => {
+/**
+ * By default, the file will be UpperCamelCase style
+ * 
+ * @param {*} s 
+ */
+const treatFileName = s => {
     if (typeof s !== 'string') return ''
-    return s.charAt(0).toUpperCase() + s.slice(1)
-  }
-  
+
+    const dividedString = s.split('-');
+    dividedString.forEach((part, index) => {
+        dividedString[index] = part.charAt(0).toUpperCase() + part.slice(1)
+    });
+
+    return dividedString.join('');
+}
+
+/**
+ * @param {string} fileName config file options 
+ * @param {Object} configOptions config file options 
+ * @param {Object} params cmd params
+ */
+const getFilesToBeCreated = (fileName, configOptions, params) => {
+
+    const COMPONENT_TYPE = !params.type || params.type !== 'function' || params.type !== 'class' ? 'class' : params.type;
+
+    const COMPONENT_EXTENSION = '.js';
+    const STYLES_EXTENSION = '.css';
+    const SPEC_EXTENSION = '.spec.js'
+
+
+    const TEMPLATES = {
+        COMPONENT: templateParser(fs.readFileSync(rootPath() + `/templates/component-${COMPONENT_TYPE}`).toString(), { ComponentName: fileName }),
+        SPEC: templateParser(fs.readFileSync(rootPath() + '/templates/spec-file').toString(), { ComponentName: fileName }),
+        STYLES: ''
+    }
+
+    const FILES = [
+        { title: 'Component', extension: COMPONENT_EXTENSION, template: TEMPLATES.COMPONENT },
+        { title: 'Styles', extension: STYLES_EXTENSION, template: TEMPLATES.STYLES },
+        { title: 'Tests', extension: SPEC_EXTENSION, template: TEMPLATES.SPEC }
+    ];
+
+    let filesToBeCreated = FILES;
+
+    if (params.spec === false) {
+        filesToBeCreated = filesToBeCreated.filter(f => f.extension !== '.spec.js');
+    }
+
+    return filesToBeCreated;
+
+}
