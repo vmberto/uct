@@ -1,8 +1,11 @@
 const fs = require('fs');
 const { rootPath, mkdir_p, hasJavascriptExtension } = require('../lib/utils');
 const templateParser = require('../lib/template-parser');
+const configFileReader = require('../lib/config-file-reader');
 
 module.exports = (commands, params) => {
+
+    const CONFIG_FILE = configFileReader();
 
     if (hasJavascriptExtension(commands[0])) commands[0] = commands[0].split('.js').join('');
     const FILE_PATH = commands[0];
@@ -18,7 +21,7 @@ module.exports = (commands, params) => {
 
     mkdir_p(fullPathStr, () => {
 
-        getFilesToBeCreated(fileName, {}, params).forEach(f => {
+        getFilesToBeCreated(fileName, CONFIG_FILE, params).forEach(f => {
             FILES.unshift({ ...f, path: `${process.cwd()}/${fullPathStr}/${fileName}${f.extension}` });
         });
 
@@ -51,12 +54,12 @@ const treatFileName = s => {
  * @param {Object} configOptions config file options 
  * @param {Object} params cmd params
  */
-const getFilesToBeCreated = (fileName, configOptions, params) => {
+const getFilesToBeCreated = (fileName, configFile, params) => {
 
-    const COMPONENT_TYPE = !params.type || params.type !== 'function' || params.type !== 'class' ? 'class' : params.type;
+    const COMPONENT_TYPE = !params.type || (params.type !== 'function' && params.type !== 'class') ? 'class' : params.type;
 
     const COMPONENT_EXTENSION = '.js';
-    const STYLES_EXTENSION = '.css';
+    const STYLES_EXTENSION = configFile ? '.' + configFile.styles : '.css';
     const SPEC_EXTENSION = '.spec.js'
 
 

@@ -2,16 +2,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+// css
+import './<$ComponentName$>.css';
+
 const <$ComponentName$> = props => {
 
     return (
-        return (
-            <div>i'm a function component</div>
-        )
+        <div>i'm a function component</div>
     );
 
 };
 
 <$ComponentName$>.propTypes = {};
 
-export default <$ComponentName$>
+export default <$ComponentName$>;

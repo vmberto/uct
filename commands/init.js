@@ -6,6 +6,6 @@ module.exports = (commands, params) => {
 
     let template = fs.readFileSync(rootPath() + '/templates/uct-json').toString();
 
-    fs.writeFile(process.cwd() + '/uct.json', template, err => console.log(err));
+    fs.writeFile(process.cwd() + '/uct.js', template, err => console.log(err));
 
 }

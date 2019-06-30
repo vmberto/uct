@@ -1,3 +1,5 @@
 module.exports = {
-    "styles": "css",                       /* Specify stylesheets files extension: 'css' (default), 'scss', 'sass', 'styl', 'jss' */
+    "styles": "css",                               /* Specify stylesheets files extension: 'css' (default), 'scss', 'sass', 'styl', 'jss' */
+    "componentsPath": "/src/app",                  /* Specify the path to the components folder. '/src/app' (default) */
+    "stateManager": "none"                          /* Specify the state manager used: 'none' (default), 'apollo', 'redux' */
 }
