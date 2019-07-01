@@ -23,7 +23,7 @@ module.exports = () => {
             console.log('Printing Help Info');
             break;
         default:
-            console.log(Logs.defaultLog)
+            console.log(Logs.defaultLog())
     }
 
 }

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Logs = require('../lib/logs');
 const { rootPath, mkdir_p, hasJavascriptExtension } = require('../lib/utils');
 const templateParser = require('../lib/template-parser');
 const configFileReader = require('../lib/config-file-reader');
@@ -26,7 +27,7 @@ module.exports = (commands, params) => {
         });
 
         FILES.forEach(file => {
-            fs.writeFile(file.path, file.template, err => console.log("\x1b[32m", `✓ ${file.title} file successfully created!`));
+            fs.writeFile(file.path, file.template, err => !err ? Logs.createSuccess(file.title) : Logs.createFail(file.title));
         });
 
     });
@@ -58,10 +59,9 @@ const getFilesToBeCreated = (fileName, configFile, params) => {
 
     const COMPONENT_TYPE = !params.type || (params.type !== 'function' && params.type !== 'class') ? 'class' : params.type;
 
-    const COMPONENT_EXTENSION = '.js';
+    const COMPONENT_EXTENSION = (configFile && configFile.usingTypescript) ? '.ts' : '.js';;
     const STYLES_EXTENSION = configFile ? '.' + configFile.styles : '.css';
     const SPEC_EXTENSION = '.spec.js'
-
 
     const TEMPLATES = {
         COMPONENT: templateParser(fs.readFileSync(rootPath() + `/templates/component-${COMPONENT_TYPE}`).toString(), { ComponentName: fileName }),
@@ -77,7 +77,7 @@ const getFilesToBeCreated = (fileName, configFile, params) => {
 
     let filesToBeCreated = FILES;
 
-    if (params.spec === false) {
+    if (params.spec === 'false') {
         filesToBeCreated = filesToBeCreated.filter(f => f.extension !== '.spec.js');
     }
 
