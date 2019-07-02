@@ -1,10 +1,10 @@
 // global
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+<? UsingCSS=?
 // css
 import './<$ComponentName$>.css';
-
+?>
 const <$ComponentName$> = props => {
 
     return (

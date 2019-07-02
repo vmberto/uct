@@ -3,6 +3,7 @@ const getCommands = require('./lib/args').getCommands;
 const Logs = require('./lib/logs');
 const create = require('./commands/create');
 const init = require('./commands/init');
+const read = require('./commands/read');
 
 module.exports = () => {
     const args = process.argv.splice(2);
@@ -20,8 +21,12 @@ module.exports = () => {
         case 'help':
             console.log('Printing Help Info');
             break;
+        case 'read':
+            read();
+            break;
         default:
             console.log(Logs.defaultLog())
+            process.prompt;
     }
 
 }

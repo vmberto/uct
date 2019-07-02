@@ -7,11 +7,14 @@
     "uct": "bin/uct"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^6.0.1"
+    "command-line-test": "^1.0.10",
+    "jest": "^24.8.0",
+    "nixt": "^0.5.1",
+    "test-console": "^1.1.0"
   }
 }

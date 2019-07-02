@@ -1,10 +1,10 @@
 // global
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+<? UsingCSS=?
 // css
 import './<$ComponentName$>.css';
-
+?>
 class <$ComponentName$> extends Component {
 
     state = {}

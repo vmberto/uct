@@ -16,7 +16,7 @@ module.exports = (commands, params) => {
 
     const foldersPath = getFoldersPathFrom(INPUTED_PATH);
     const fileName = getFileNameFrom(INPUTED_PATH);
-    
+
     mkdirP(foldersPath, () => {
 
         const FILES = [];
@@ -39,7 +39,7 @@ module.exports = (commands, params) => {
  */
 const getFoldersPathFrom = p => {
     let fullPathArr = p.split('/');
-    
+
     let folderName = fullPathArr[fullPathArr.length - 2] || fullPathArr[fullPathArr.length - 1];
     folderName = treatNameOf('Folder', folderName);
 
@@ -58,7 +58,7 @@ const getFoldersPathFrom = p => {
  */
 const getFileNameFrom = p => {
     let fullPathArr = p.split('/');
-    
+
     let fileName = treatNameOf('File', fullPathArr[fullPathArr.length - 1]);
 
     fullPathArr[fullPathArr.length - 1] = fileName;
@@ -90,7 +90,7 @@ const treatNameOf = (type, name) => {
         }
 
     }
-    
+
     const dividedString = name.split('-');
     dividedString.forEach((part, index) => {
         dividedString[index] = part.charAt(0).toUpperCase() + part.slice(1)
@@ -108,26 +108,36 @@ const getFilesToBeCreated = (fileName, params) => {
 
     const COMPONENT_TYPE = !params.type || (params.type !== 'function' && params.type !== 'class') ? 'class' : params.type;
 
-    const COMPONENT_EXTENSION = (CONFIG_FILE && CONFIG_FILE.usingTypescript) ? '.ts' : '.js';;
-    const STYLES_EXTENSION = CONFIG_FILE ? '.' + CONFIG_FILE.styles : '.css';
-    const SPEC_EXTENSION = '.spec.js'
+    const EXTENSIONS = {
+        COMPONENT: (CONFIG_FILE && CONFIG_FILE.usingTypescript) ? '.ts' : '.js',
+        STYLES: CONFIG_FILE ? '.' + CONFIG_FILE.styles : '.css',
+        SPEC: '.spec.js'
+    }
 
     const TEMPLATES = {
-        COMPONENT: templateParser(fs.readFileSync(`${__dirname}/../templates/component-${COMPONENT_TYPE}`).toString(), { ComponentName: fileName }),
+        COMPONENT: templateParser(fs.readFileSync(`${__dirname}/../templates/component-${COMPONENT_TYPE}`).toString(), { ComponentName: fileName, UsingCSS: CONFIG_FILE && CONFIG_FILE.styles === 'none' ? false : true }),
         SPEC: templateParser(fs.readFileSync(`${__dirname}/../templates/spec-file`).toString(), { ComponentName: fileName }),
         STYLES: ''
     }
 
     const FILES = [
-        { title: 'Component', extension: COMPONENT_EXTENSION, template: TEMPLATES.COMPONENT },
-        { title: 'Styles', extension: STYLES_EXTENSION, template: TEMPLATES.STYLES },
-        { title: 'Tests', extension: SPEC_EXTENSION, template: TEMPLATES.SPEC }
+        { title: 'Component', extension: EXTENSIONS.COMPONENT, template: TEMPLATES.COMPONENT },
+        { title: 'Styles', extension: EXTENSIONS.STYLES, template: TEMPLATES.STYLES },
+        { title: 'Tests', extension: EXTENSIONS.SPEC, template: TEMPLATES.SPEC }
     ];
 
     let filesToBeCreated = FILES;
 
     if (params.spec === 'false') {
         filesToBeCreated = filesToBeCreated.filter(f => f.extension !== '.spec.js');
+    }
+
+    if (CONFIG_FILE && CONFIG_FILE.styles === 'none') {
+        filesToBeCreated = filesToBeCreated.filter(f => f.title !== 'Styles');
+    }
+
+    if (Object.keys(params).includes('simple') || Object.keys(params).includes('s')) {
+        filesToBeCreated = filesToBeCreated.filter(f => f.title === 'Component');
     }
 
     return filesToBeCreated;
