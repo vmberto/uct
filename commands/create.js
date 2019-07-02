@@ -1,30 +1,28 @@
+// global
 const fs = require('fs');
-const Logs = require('../lib/logs');
-const { mkdirP, hasJavascriptExtension } = require('../utils');
-const templateParser = require('../lib/template-parser');
+// lib
 const configFileReader = require('../lib/config-file-reader');
+const Logs = require('../lib/logs');
+const templateParser = require('../lib/template-parser');
+// utils
+const { mkdirP, hasJavascriptExtension } = require('../utils');
+
+const CONFIG_FILE = configFileReader();
 
 module.exports = (commands, params) => {
 
-    const CONFIG_FILE = configFileReader();
-
     if (hasJavascriptExtension(commands[1])) commands[1] = commands[1].split('.js').join('');
-    const FILE_PATH = commands[1];
-    const FILES = [];
+    const INPUTED_PATH = commands[1];
 
-
-    let fullPathArr = FILE_PATH.split('/');
-    /** @byDefault the file created is capitalized, could be changed in uct's config file */
-    let fileName = treatFileName(fullPathArr[fullPathArr.length - 1]);
+    const foldersPath = getFoldersPathFrom(INPUTED_PATH);
+    const fileName = getFileNameFrom(INPUTED_PATH);
     
-    fullPathArr[fullPathArr.length - 1] = fileName;
-    let fullPathStr = fullPathArr.join('/');
+    mkdirP(foldersPath, () => {
 
+        const FILES = [];
 
-    mkdirP(fullPathStr, () => {
-
-        getFilesToBeCreated(fileName, CONFIG_FILE, params).forEach(f => {
-            FILES.unshift({ ...f, path: `${process.cwd()}/${fullPathStr}/${fileName}${f.extension}` });
+        getFilesToBeCreated(fileName, params).forEach(f => {
+            FILES.unshift({ ...f, path: `${process.cwd()}/${foldersPath}/${fileName}${f.extension}` });
         });
 
         FILES.forEach(file => {
@@ -36,14 +34,64 @@ module.exports = (commands, params) => {
 }
 
 /**
+ * 
+ * @param {string} p path inputed by user
+ */
+const getFoldersPathFrom = p => {
+    let fullPathArr = p.split('/');
+    
+    let folderName = fullPathArr[fullPathArr.length - 2] || fullPathArr[fullPathArr.length - 1];
+    folderName = treatNameOf('Folder', folderName);
+
+    if (fullPathArr[fullPathArr.length - 2]) {
+        fullPathArr[fullPathArr.length - 2] = folderName;
+    } else {
+        fullPathArr[fullPathArr.length - 1] = folderName;
+    }
+
+    return fullPathArr.join('/');
+};
+
+/**
+ * 
+ * @param {string} p path inputed by user
+ */
+const getFileNameFrom = p => {
+    let fullPathArr = p.split('/');
+    
+    let fileName = treatNameOf('File', fullPathArr[fullPathArr.length - 1]);
+
+    fullPathArr[fullPathArr.length - 1] = fileName;
+
+    return fullPathArr.join('/');
+};
+
+/**
  * By default, the file will be UpperCamelCase style
  * 
- * @param {*} s 
+ * @param {string} type
+ * @param {string} name
  */
-const treatFileName = s => {
-    if (typeof s !== 'string') return ''
+const treatNameOf = (type, name) => {
+    if (typeof name !== 'string') return '';
 
-    const dividedString = s.split('-');
+    if (CONFIG_FILE) {
+
+        const usedCase = CONFIG_FILE[`component${type}Name`];
+
+        switch (usedCase) {
+
+            case 'UpperCamelCase': break;
+            case 'lowerCamelCase': break;
+            case 'kebab-case': break;
+            case 'snake_case': break;
+            default: break;
+
+        }
+
+    }
+    
+    const dividedString = name.split('-');
     dividedString.forEach((part, index) => {
         dividedString[index] = part.charAt(0).toUpperCase() + part.slice(1)
     });
@@ -56,12 +104,12 @@ const treatFileName = s => {
  * @param {Object} configOptions config file options 
  * @param {Object} params cmd params
  */
-const getFilesToBeCreated = (fileName, configFile, params) => {
+const getFilesToBeCreated = (fileName, params) => {
 
     const COMPONENT_TYPE = !params.type || (params.type !== 'function' && params.type !== 'class') ? 'class' : params.type;
 
-    const COMPONENT_EXTENSION = (configFile && configFile.usingTypescript) ? '.ts' : '.js';;
-    const STYLES_EXTENSION = configFile ? '.' + configFile.styles : '.css';
+    const COMPONENT_EXTENSION = (CONFIG_FILE && CONFIG_FILE.usingTypescript) ? '.ts' : '.js';;
+    const STYLES_EXTENSION = CONFIG_FILE ? '.' + CONFIG_FILE.styles : '.css';
     const SPEC_EXTENSION = '.spec.js'
 
     const TEMPLATES = {
