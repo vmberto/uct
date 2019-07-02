@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Logs = require('../lib/logs');
-const { rootPath, mkdir_p, hasJavascriptExtension } = require('../lib/utils');
+const { mkdirP, hasJavascriptExtension } = require('../utils');
 const templateParser = require('../lib/template-parser');
 const configFileReader = require('../lib/config-file-reader');
 
@@ -8,19 +8,20 @@ module.exports = (commands, params) => {
 
     const CONFIG_FILE = configFileReader();
 
-    if (hasJavascriptExtension(commands[0])) commands[0] = commands[0].split('.js').join('');
-    const FILE_PATH = commands[0];
+    if (hasJavascriptExtension(commands[1])) commands[1] = commands[1].split('.js').join('');
+    const FILE_PATH = commands[1];
     const FILES = [];
 
 
     let fullPathArr = FILE_PATH.split('/');
     /** @byDefault the file created is capitalized, could be changed in uct's config file */
     let fileName = treatFileName(fullPathArr[fullPathArr.length - 1]);
+    
     fullPathArr[fullPathArr.length - 1] = fileName;
     let fullPathStr = fullPathArr.join('/');
 
 
-    mkdir_p(fullPathStr, () => {
+    mkdirP(fullPathStr, () => {
 
         getFilesToBeCreated(fileName, CONFIG_FILE, params).forEach(f => {
             FILES.unshift({ ...f, path: `${process.cwd()}/${fullPathStr}/${fileName}${f.extension}` });
@@ -64,8 +65,8 @@ const getFilesToBeCreated = (fileName, configFile, params) => {
     const SPEC_EXTENSION = '.spec.js'
 
     const TEMPLATES = {
-        COMPONENT: templateParser(fs.readFileSync(rootPath() + `/templates/component-${COMPONENT_TYPE}`).toString(), { ComponentName: fileName }),
-        SPEC: templateParser(fs.readFileSync(rootPath() + '/templates/spec-file').toString(), { ComponentName: fileName }),
+        COMPONENT: templateParser(fs.readFileSync(`${__dirname}/../templates/component-${COMPONENT_TYPE}`).toString(), { ComponentName: fileName }),
+        SPEC: templateParser(fs.readFileSync(`${__dirname}/../templates/spec-file`).toString(), { ComponentName: fileName }),
         STYLES: ''
     }
 

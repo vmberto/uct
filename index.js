@@ -12,11 +12,9 @@ module.exports = () => {
 
     switch (commands[0]) {
         case 'create':
-            commands = commands.splice(1);
             create(commands, params);
             break;
         case 'init':
-            console.log('Creating config file ...');
             init(commands, params);
             break;
         case 'help':
