@@ -33,13 +33,19 @@ const toSnakeCase = str => str.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[\s_
  * transform to UpperCamelCase
  * @param {string} str
  */
-const toUpperCamelCase = str => str.replace(/^([A-Z])|\s(\w)/g, (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase()).split('').charAt(0).toUpperCase().join('');
+const toUpperCamelCase = (str) => capitalize(str.toLowerCase().replace( /[-_]+/g, ' ').replace( /[^\w\s]/g, '').replace( / (.)/g, $1 => $1.toUpperCase()).replace( / /g, '' ));
 
 /**
  * transform to lowerCamelCase
  * @param {string} str
  */
-const toLowerCamelCase = str => str.replace(/^([A-Z])|\s(\w)/g, (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase());
+const toLowerCamelCase = str => str.toLowerCase().replace( /[-_]+/g, ' ').replace( /[^\w\s]/g, '').replace( / (.)/g, $1 => $1.toUpperCase()).replace( / /g, '' );
+
+/**
+ * capitalize string
+ * @param {string} str
+ */
+const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 
 module.exports = {
