@@ -12,6 +12,4 @@ module.exports = (commands, params) => {
 
     console.log(templateParser(fs.readFileSync(`${__dirname}/../templates/component-class`).toString(), { ComponentName: 'Alerta', UsingCSS: false }));
     
-    
-
 }

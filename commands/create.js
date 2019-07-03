@@ -2,10 +2,11 @@
 const fs = require('fs');
 // lib
 const configFileReader = require('../lib/config-file-reader');
+const Errors = require('../lib/errors');
 const Logs = require('../lib/logs');
 const templateParser = require('../lib/template-parser');
 // utils
-const { mkdirP, hasJavascriptExtension } = require('../utils');
+const { mkdirP, hasJavascriptExtension, toKebabCase, toSnakeCase, toUpperCamelCase, toLowerCamelCase } = require('../utils');
 
 const CONFIG_FILE = configFileReader();
 
@@ -14,18 +15,21 @@ module.exports = (commands, params) => {
     if (hasJavascriptExtension(commands[1])) commands[1] = commands[1].split('.js').join('');
     const INPUTED_PATH = commands[1];
 
-    const foldersPath = getFoldersPathFrom(INPUTED_PATH);
+    let foldersPath = getFoldersPathFrom(INPUTED_PATH);
     const fileName = getFileNameFrom(INPUTED_PATH);
+
+    /** Simple Component = Component created outside a folder */
+    if (params.simple || params.s) {
+        foldersPath = foldersPath.split('/');
+        foldersPath.pop();
+        foldersPath = foldersPath.join('/');
+    }
+
+    const filesToBeCreated = getFilesToBeCreated(fileName, foldersPath, params);
 
     mkdirP(foldersPath, () => {
 
-        const FILES = [];
-
-        getFilesToBeCreated(fileName, params).forEach(f => {
-            FILES.unshift({ ...f, path: `${process.cwd()}/${foldersPath}/${fileName}${f.extension}` });
-        });
-
-        FILES.forEach(file => {
+        filesToBeCreated.forEach(file => {
             fs.writeFile(file.path, file.template, err => !err ? Logs.createSuccess(file.title) : Logs.createFail(file.title));
         });
 
@@ -40,14 +44,10 @@ module.exports = (commands, params) => {
 const getFoldersPathFrom = p => {
     let fullPathArr = p.split('/');
 
-    let folderName = fullPathArr[fullPathArr.length - 2] || fullPathArr[fullPathArr.length - 1];
+    let folderName = fullPathArr[fullPathArr.length - 1];
     folderName = treatNameOf('Folder', folderName);
 
-    if (fullPathArr[fullPathArr.length - 2]) {
-        fullPathArr[fullPathArr.length - 2] = folderName;
-    } else {
-        fullPathArr[fullPathArr.length - 1] = folderName;
-    }
+    fullPathArr[fullPathArr.length - 1] = folderName;
 
     return fullPathArr.join('/');
 };
@@ -61,9 +61,7 @@ const getFileNameFrom = p => {
 
     let fileName = treatNameOf('File', fullPathArr[fullPathArr.length - 1]);
 
-    fullPathArr[fullPathArr.length - 1] = fileName;
-
-    return fullPathArr.join('/');
+    return fileName;
 };
 
 /**
@@ -71,32 +69,26 @@ const getFileNameFrom = p => {
  * 
  * @param {string} type
  * @param {string} name
+ * 
+ * @throws {INVALID_CASE_NAME_FOR_FILE}
  */
 const treatNameOf = (type, name) => {
     if (typeof name !== 'string') return '';
+    const usedCase = CONFIG_FILE ? CONFIG_FILE[`component${type}Case`] : 'default';
+    
+    // File names can't use kebab-case
+    if (type === 'File' && usedCase === 'kebab-case') throw Errors.INVALID_CASE_NAME_FOR_FILE();
 
-    if (CONFIG_FILE) {
+    switch (usedCase) {
 
-        const usedCase = CONFIG_FILE[`component${type}Name`];
-
-        switch (usedCase) {
-
-            case 'UpperCamelCase': break;
-            case 'lowerCamelCase': break;
-            case 'kebab-case': break;
-            case 'snake_case': break;
-            default: break;
-
-        }
+        case 'UpperCamelCase': return toUpperCamelCase(name);
+        case 'lowerCamelCase': return toLowerCamelCase(name);
+        case 'kebab-case': return toKebabCase(name);
+        case 'snake_case': return toSnakeCase(name);
+        default: return toUpperCamelCase(name);
 
     }
 
-    const dividedString = name.split('-');
-    dividedString.forEach((part, index) => {
-        dividedString[index] = part.charAt(0).toUpperCase() + part.slice(1)
-    });
-
-    return dividedString.join('');
 }
 
 /**
@@ -104,7 +96,7 @@ const treatNameOf = (type, name) => {
  * @param {Object} configOptions config file options 
  * @param {Object} params cmd params
  */
-const getFilesToBeCreated = (fileName, params) => {
+const getFilesToBeCreated = (fileName, foldersPath, params) => {
 
     const COMPONENT_TYPE = !params.type || (params.type !== 'function' && params.type !== 'class') ? 'class' : params.type;
 
@@ -121,9 +113,9 @@ const getFilesToBeCreated = (fileName, params) => {
     }
 
     const FILES = [
-        { title: 'Component', extension: EXTENSIONS.COMPONENT, template: TEMPLATES.COMPONENT },
-        { title: 'Styles', extension: EXTENSIONS.STYLES, template: TEMPLATES.STYLES },
-        { title: 'Tests', extension: EXTENSIONS.SPEC, template: TEMPLATES.SPEC }
+        { title: 'Component', template: TEMPLATES.COMPONENT, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.COMPONENT}` },
+        { title: 'Styles', template: TEMPLATES.STYLES, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.STYLES}` },
+        { title: 'Tests', template: TEMPLATES.SPEC, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.SPEC}` }
     ];
 
     let filesToBeCreated = FILES;
