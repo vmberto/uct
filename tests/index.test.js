@@ -7,7 +7,7 @@ describe('test create', () => {
 
     it('creates a component', () => {
 
-        const x = cp.execSync('uct create test', { cwd: __dirname });
+        cp.execSync('uct create test', { cwd: __dirname });
 
         let component, styles, tests;
         
@@ -27,7 +27,7 @@ describe('test create', () => {
 
     it('creates a component without tests', () => {
 
-        const x = cp.execSync('uct create test --spec false', { cwd: __dirname });
+        cp.execSync('uct create test --spec false', { cwd: __dirname });
 
         let component, styles, tests;
         
@@ -52,10 +52,10 @@ describe('test create', () => {
  * @param {string} dir_path
  * @see https://stackoverflow.com/a/42505874/3027390
  */
-function rimraf(dir_path) {
+const rimraf = dir_path => {
     if (fs.existsSync(dir_path)) {
-        fs.readdirSync(dir_path).forEach(function(entry) {
-            var entry_path = path.join(dir_path, entry);
+        fs.readdirSync(dir_path).forEach(entry => {
+            const entry_path = path.join(dir_path, entry);
             if (fs.lstatSync(entry_path).isDirectory()) {
                 rimraf(entry_path);
             } else {

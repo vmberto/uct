@@ -1,7 +1,9 @@
 {
   "name": "uct",
+  "author": "Umberto Tenório de Barros Filho",
+  "description": "command-line interface tool for manage react projects structure",
   "version": "1.0.0",
-  "description": "",
+  "license": "MIT",
   "main": "index.js",
   "bin": {
     "uct": "bin/uct"
@@ -9,8 +11,6 @@
   "scripts": {
     "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "jest": "^24.8.0"
   }
