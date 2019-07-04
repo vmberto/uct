@@ -27,10 +27,11 @@ const toKebabCase = str => str.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[\s_
  * transform to snake_case
  * @param {string} str
  */
-const toSnakeCase = str => str.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[\s_]+/g, '_').toLowerCase();
+const toSnakeCase = str => str.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[\s_-]+/g, '_').toLowerCase();
 
 /**
  * transform to UpperCamelCase
+ * @BUG HealthInsuranceModal => HealthinsuranceModal
  * @param {string} str
  */
 const toUpperCamelCase = (str) => capitalize(str.toLowerCase().replace( /[-_]+/g, ' ').replace( /[^\w\s]/g, '').replace( / (.)/g, $1 => $1.toUpperCase()).replace( / /g, '' ));

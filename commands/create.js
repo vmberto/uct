@@ -75,7 +75,7 @@ const getFileNameFrom = p => {
 const treatNameOf = (type, name) => {
     if (typeof name !== 'string') return '';
     const usedCase = CONFIG_FILE ? CONFIG_FILE[`component${type}Case`] : 'default';
-    
+
     // File names can't use kebab-case
     if (type === 'File' && usedCase === 'kebab-case') throw Errors.INVALID_CASE_NAME_FOR_FILE();
 
@@ -107,21 +107,29 @@ const getFilesToBeCreated = (fileName, foldersPath, params) => {
     }
 
     const TEMPLATES = {
-        COMPONENT: templateParser(fs.readFileSync(`${__dirname}/../templates/component-${COMPONENT_TYPE}`).toString(), { ComponentName: fileName, UsingCSS: CONFIG_FILE && CONFIG_FILE.styles === 'none' ? false : true }),
+        COMPONENT: templateParser(
+            fs.readFileSync(`${__dirname}/../templates/component-${COMPONENT_TYPE}`).toString(),
+            { 
+                ComponentName: fileName,
+                UsingCSS: CONFIG_FILE && CONFIG_FILE.styles === 'none' ? false : true,
+                StylesExtension: CONFIG_FILE && CONFIG_FILE.styles ? CONFIG_FILE.styles : 'css'
+            }
+        ),
+
         SPEC: templateParser(fs.readFileSync(`${__dirname}/../templates/spec-file`).toString(), { ComponentName: fileName }),
         STYLES: ''
     }
 
     const FILES = [
-        { title: 'Component', template: TEMPLATES.COMPONENT, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.COMPONENT}` },
-        { title: 'Styles', template: TEMPLATES.STYLES, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.STYLES}` },
-        { title: 'Tests', template: TEMPLATES.SPEC, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.SPEC}` }
+        { title: 'Component', template: TEMPLATES.COMPONENT, extension: EXTENSIONS.COMPONENT, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.COMPONENT}` },
+        { title: 'Styles', template: TEMPLATES.STYLES, extension: EXTENSIONS.STYLES, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.STYLES}` },
+        { title: 'Tests', template: TEMPLATES.SPEC, extension: EXTENSIONS.SPEC, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.SPEC}` }
     ];
 
     let filesToBeCreated = FILES;
 
     if (params.spec === 'false') {
-        filesToBeCreated = filesToBeCreated.filter(f => f.extension !== '.spec.js');
+        filesToBeCreated = filesToBeCreated.filter(f => f.extension !== EXTENSIONS.SPEC);
     }
 
     if (CONFIG_FILE && CONFIG_FILE.styles === 'none') {

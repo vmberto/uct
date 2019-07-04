@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 <? UsingCSS=?
-// css
-import './<$ComponentName$>.css';
+// stylesheets
+import './<$ComponentName$>.<$StylesExtension$>';
 ?>
 class <$ComponentName$> extends Component {
 
@@ -11,8 +11,8 @@ class <$ComponentName$> extends Component {
 
     render() {
         return (
-            <div>i'm a class component</div>
-        )
+            <div>i am a class component</div>
+        );
     }
 
 }

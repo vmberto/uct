@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 <? UsingCSS=?
 // css
-import './<$ComponentName$>.css';
+import './<$ComponentName$>.<$StylesExtension$>';
 ?>
 const <$ComponentName$> = props => {
 
