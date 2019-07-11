@@ -1,9 +1,8 @@
-var tests = require('./tests.helper');
 var fs = require('fs');
-var path = require('path');
 var cp = require('child_process');
+var utils = require('./utils');
 
-describe('test create', () => {
+describe('CREATE COMPONENT SERVICE', () => {
 
     it('creates a component', () => {
 
@@ -19,8 +18,9 @@ describe('test create', () => {
             //
         }
 
-        rimraf(__dirname + '/Test');
+        utils.rimraf(__dirname + '/Test');
 
+        // component, style and test files created
         expect(!!component && !!styles && !!tests).toBeTruthy();
 
     });
@@ -39,29 +39,32 @@ describe('test create', () => {
             //
         }
 
-        rimraf(__dirname + '/Test');
+        utils.rimraf(__dirname + '/Test');
 
+        // component and style files created
         expect(!!component && !!styles && !!!tests).toBeTruthy();
 
     });
 
-});
+    it('creates a component without stylesheets', () => {
 
-/**
- * Remove directory recursively
- * @param {string} dir_path
- * @see https://stackoverflow.com/a/42505874/3027390
- */
-const rimraf = dir_path => {
-    if (fs.existsSync(dir_path)) {
-        fs.readdirSync(dir_path).forEach(entry => {
-            const entry_path = path.join(dir_path, entry);
-            if (fs.lstatSync(entry_path).isDirectory()) {
-                rimraf(entry_path);
-            } else {
-                fs.unlinkSync(entry_path);
-            }
-        });
-        fs.rmdirSync(dir_path);
-    }
-}
+        cp.execSync('uct create test --styles false', { cwd: __dirname });
+
+        let component, styles, tests;
+        
+        try {
+            component = fs.readFileSync(__dirname + '/Test/Test.js');
+            tests = fs.readFileSync(__dirname + '/Test/Test.spec.js');
+            styles = fs.readFileSync(__dirname + '/Test/Test.css');
+        } catch(e) {
+            //
+        }
+
+        utils.rimraf(__dirname + '/Test');
+
+        // component and test files created
+        expect(!!component && !!!styles && !!tests).toBeTruthy();
+
+    });
+
+});

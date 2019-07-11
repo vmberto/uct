@@ -34,13 +34,13 @@ const toSnakeCase = str => str.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[\s_
  * @BUG HealthInsuranceModal => HealthinsuranceModal
  * @param {string} str
  */
-const toUpperCamelCase = (str) => capitalize(str.toLowerCase().replace( /[-_]+/g, ' ').replace( /[^\w\s]/g, '').replace( / (.)/g, $1 => $1.toUpperCase()).replace( / /g, '' ));
+const toUpperCamelCase = str => capitalize(str.replace(/([-_][a-z])/ig, $1 => $1.toUpperCase().replace('-', '').replace('_', '')));
 
 /**
  * transform to lowerCamelCase
  * @param {string} str
  */
-const toLowerCamelCase = str => str.toLowerCase().replace( /[-_]+/g, ' ').replace( /[^\w\s]/g, '').replace( / (.)/g, $1 => $1.toUpperCase()).replace( / /g, '' );
+const toLowerCamelCase = str => str.replace(/([-_][a-z])/ig, $1 => $1.toUpperCase().replace('-', '').replace('_', ''));
 
 /**
  * capitalize string

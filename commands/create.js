@@ -132,8 +132,8 @@ const getFilesToBeCreated = (fileName, foldersPath, params) => {
         filesToBeCreated = filesToBeCreated.filter(f => f.extension !== EXTENSIONS.SPEC);
     }
 
-    if (CONFIG_FILE && CONFIG_FILE.styles === 'none') {
-        filesToBeCreated = filesToBeCreated.filter(f => f.title !== 'Styles');
+    if ((CONFIG_FILE && CONFIG_FILE.styles === 'none') || params.styles === 'false') {
+        filesToBeCreated = filesToBeCreated.filter(f => f.extension !== EXTENSIONS.STYLES);
     }
 
     if (Object.keys(params).includes('simple') || Object.keys(params).includes('s')) {
