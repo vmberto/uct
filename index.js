@@ -2,7 +2,6 @@ const Args = require('./lib/args');
 const Logs = require('./lib/logs');
 const create = require('./commands/create');
 const init = require('./commands/init');
-const read = require('./commands/read');
 
 module.exports = () => {
 
@@ -20,9 +19,6 @@ module.exports = () => {
             break;
         case 'help':
             console.log('Printing Help Info');
-            break;
-        case 'read':
-            read();
             break;
         default:
             console.log(Logs.defaultLog())

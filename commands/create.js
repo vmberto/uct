@@ -6,7 +6,14 @@ const Errors = require('../lib/errors');
 const Logs = require('../lib/logs');
 const templateParser = require('../lib/template-parser');
 // utils
-const { mkdirP, hasJavascriptExtension, toKebabCase, toSnakeCase, toUpperCamelCase, toLowerCamelCase } = require('../utils');
+const { 
+    mkdirP,
+    hasJavascriptExtension,
+    toKebabCase,
+    toSnakeCase,
+    toUpperCamelCase,
+    toLowerCamelCase
+} = require('../utils');
 
 const CONFIG_FILE = configFileReader();
 
@@ -19,11 +26,11 @@ module.exports = (commands, params) => {
     const fileName = getFileNameFrom(INPUTED_PATH);
 
     /** Simple Component = Component created outside a folder */
-    if (params.simple || params.s) {
-        foldersPath = foldersPath.split('/');
-        foldersPath.pop();
-        foldersPath = foldersPath.join('/');
-    }
+    // if (params.simple || params.s) {
+    //     foldersPath = foldersPath.split('/');
+    //     foldersPath.pop();
+    //     foldersPath = foldersPath.join('/');
+    // }
 
     const filesToBeCreated = getFilesToBeCreated(fileName, foldersPath, params);
 
