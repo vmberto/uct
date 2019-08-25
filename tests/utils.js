@@ -2,14 +2,7 @@ const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-exports.execute = command => 
-    cp.exec(command, { cwd: __dirname }, (error, stdout, stderr) => { error, stdout, stderr });
-         
-// console.log('stdout: ' + stdout);
-// console.log('stderr: ' + stderr);
-// if (error !== null) {
-//     console.log('exec error: ' + error);
-// }
+exports.execute = command => cp.execSync(command, { cwd: __dirname });
 
 /**
  * Remove directory recursively

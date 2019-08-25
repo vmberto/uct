@@ -1,11 +1,12 @@
 var fs = require('fs');
 var cp = require('child_process');
+var { rimraf, execute } = require('./utils');
 
 describe('UCT INIT - CONFIG FILE', () => {
 
     it('creates config file', () => {
 
-        cp.execSync('uct init', { cwd: __dirname });
+        execute('uct init');
 
         let configFile;
         
