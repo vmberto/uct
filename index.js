@@ -1,15 +1,15 @@
-const getParams = require('./lib/args').getParams;
-const getCommands = require('./lib/args').getCommands;
+const Args = require('./lib/args');
 const Logs = require('./lib/logs');
 const create = require('./commands/create');
 const init = require('./commands/init');
 const read = require('./commands/read');
 
 module.exports = () => {
-    const args = process.argv.splice(2);
 
-    const params = getParams(args);
-    let commands = getCommands(args);
+    const args = new Args();
+
+    const params = args.params;
+    const commands = args.commands;
 
     switch (commands[0]) {
         case 'create':
