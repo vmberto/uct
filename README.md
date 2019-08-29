@@ -1,4 +1,6 @@
-# uct
+# uct 
+[![Build Status](https://travis-ci.org/UmbertoB/uct.svg?branch=master)](https://travis-ci.org/UmbertoB/uct)
+
 command line program for manage react projects structure
 
 ### Create Component
