@@ -1,3 +1,5 @@
+const Errors = require('../lib/errors');
+
 /**
  * 
  * Check if is a Javascript File
@@ -48,6 +50,31 @@ const toLowerCamelCase = str => str.replace(/([-_][a-z])/ig, $1 => $1.toUpperCas
  */
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
 
+/**
+ * By default, the file will be UpperCamelCase style
+ * 
+ * @param {string} type
+ * @param {string} name
+ * 
+ * @throws {INVALID_CASE_NAME_FOR_FILE}
+ */
+const treatNameOf = (type, name, nameCase) => {
+    if (typeof name !== 'string') return '';
+
+    // File names can't use kebab-case
+    if (type === 'File' && nameCase === 'kebab-case') throw Errors.INVALID_CASE_NAME_FOR_FILE();
+
+    switch (nameCase) {
+
+        case 'UpperCamelCase': return toUpperCamelCase(name);
+        case 'lowerCamelCase': return toLowerCamelCase(name);
+        case 'kebab-case': return toKebabCase(name);
+        case 'snake_case': return toSnakeCase(name);
+        default: return toUpperCamelCase(name);
+
+    }
+
+}
 
 module.exports = {
     hasJavascriptExtension,
@@ -56,4 +83,5 @@ module.exports = {
     toSnakeCase,
     toUpperCamelCase,
     toLowerCamelCase,
+    treatNameOf,
 }

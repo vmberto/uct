@@ -5,5 +5,14 @@ module.exports = {
     
     "componentsPath": "/src/app",                /* Specify the path to the components folder. '/src/app' (default) */
     "componentFileCase": "UpperCamelCase",         /* Specify the case for component file name: UpperCamelCase (default), lowerCamelCase, snake_case */
-    "componentFolderCase": "UpperCamelCase",       /* Specify the case for component folder name: UpperCamelCase (default), lowerCamelCase, kebab-case, snake_case */
+    "componentFolderCase": "UpperCamelCase",      /* Specify the case for component folder name: UpperCamelCase (default), lowerCamelCase, kebab-case, snake_case */
+
+    "defaults": {
+        "component": {
+            "style": true,            /* Always create stylesheets for new components */
+            "spec": true,             /* Always create spec files for new components */
+            "insideFolder": true,      /* Always create components inside folders */
+            "type": "class"           /* Specify the default component type: class (default), function */
+        }
+    }
 }

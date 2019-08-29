@@ -1,11 +1,11 @@
 // global
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-<? UsingCSS=?
+<? COMPONENT_HAS_STYLESHEETS=?
 // css
-import './<$ComponentName$>.<$StylesExtension$>';
+import './<$COMPONENT_NAME$>.<$STYLES_EXTENSION$>';
 ?>
-const <$ComponentName$> = props => {
+const <$COMPONENT_NAME$> = props => {
 
     return (
         <div>i'm a function component</div>
@@ -13,6 +13,6 @@ const <$ComponentName$> = props => {
 
 };
 
-<$ComponentName$>.propTypes = {};
+<$COMPONENT_NAME$>.propTypes = {};
 
-export default <$ComponentName$>;
+export default <$COMPONENT_NAME$>;

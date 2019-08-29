@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { treatNameOf } = require('./string');
 
 /**
  * @from https://brunopedro.com/2010/12/15/recursive-directory-nodejs/
@@ -40,6 +41,38 @@ const mkdirP = (path, callback, position = 0) => {
     })
 }
 
+/**
+ * 
+ * @param {string} p path inputed by user
+ * @returns path without filename (folders stack)
+ */
+const getFoldersFromPath = (p, nameCase) => {
+    let fullPathArr = p.split('/');
+
+    let folderName = fullPathArr[fullPathArr.length - 1];
+    folderName = treatNameOf('Folder', folderName, nameCase);
+
+    fullPathArr[fullPathArr.length - 1] = folderName;
+
+    return fullPathArr.join('/');
+};
+
+/**
+ * 
+ * @param {string} p path inputed by user
+ * @returns path without folders stack
+ */
+const getFileNameFromPath = (p, nameCase) => {
+    let fullPathArr = p.split('/');
+
+    let fileName = treatNameOf('File', fullPathArr[fullPathArr.length - 1], nameCase);
+
+    return fileName;
+};
+
+
 module.exports = {
-    mkdirP
+    mkdirP,
+    getFoldersFromPath,
+    getFileNameFromPath,
 };

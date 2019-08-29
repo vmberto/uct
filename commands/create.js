@@ -2,151 +2,108 @@
 const fs = require('fs');
 // lib
 const configFileReader = require('../lib/config-file-reader');
-const Errors = require('../lib/errors');
 const Logs = require('../lib/logs');
 const templateParser = require('../lib/template-parser');
 // utils
-const { 
+const {
     mkdirP,
-    hasJavascriptExtension,
-    toKebabCase,
-    toSnakeCase,
-    toUpperCamelCase,
-    toLowerCamelCase
+    getFoldersFromPath,
+    getFileNameFromPath,
 } = require('../utils');
 
 const CONFIG_FILE = configFileReader();
 
 module.exports = (commands, params) => {
 
-    if (hasJavascriptExtension(commands[1])) commands[1] = commands[1].split('.js').join('');
     const INPUTED_PATH = commands[1];
 
-    let foldersPath = getFoldersPathFrom(INPUTED_PATH);
-    const fileName = getFileNameFrom(INPUTED_PATH);
+    const foldersPath = getFoldersFromPath(INPUTED_PATH, CONFIG_FILE ? CONFIG_FILE[`componentFolderCase`] : 'default');
+    const fileName = getFileNameFromPath(INPUTED_PATH, CONFIG_FILE ? CONFIG_FILE[`componentFileCase`] : 'default');
 
-    /** Simple Component = Component created outside a folder */
-    // if (params.simple || params.s) {
-    //     foldersPath = foldersPath.split('/');
-    //     foldersPath.pop();
-    //     foldersPath = foldersPath.join('/');
-    // }
+    const FILES = getFilesToBeCreated(fileName, foldersPath, params);
 
-    const filesToBeCreated = getFilesToBeCreated(fileName, foldersPath, params);
-
-    mkdirP(foldersPath, () => {
-
-        filesToBeCreated.forEach(file => {
-            fs.writeFile(file.path, file.template, err => !err ? Logs.createSuccess(file.title) : Logs.createFail(file.title));
-        });
-
-    });
+    mkdirP(foldersPath, () => FILES.forEach(file => write(file)));
 
 }
 
 /**
+ * Writes a file
  * 
- * @param {string} p path inputed by user
+ * @param {Object} file   
  */
-const getFoldersPathFrom = p => {
-    let fullPathArr = p.split('/');
-
-    let folderName = fullPathArr[fullPathArr.length - 1];
-    folderName = treatNameOf('Folder', folderName);
-
-    fullPathArr[fullPathArr.length - 1] = folderName;
-
-    return fullPathArr.join('/');
-};
-
-/**
- * 
- * @param {string} p path inputed by user
- */
-const getFileNameFrom = p => {
-    let fullPathArr = p.split('/');
-
-    let fileName = treatNameOf('File', fullPathArr[fullPathArr.length - 1]);
-
-    return fileName;
-};
-
-/**
- * By default, the file will be UpperCamelCase style
- * 
- * @param {string} type
- * @param {string} name
- * 
- * @throws {INVALID_CASE_NAME_FOR_FILE}
- */
-const treatNameOf = (type, name) => {
-    if (typeof name !== 'string') return '';
-    const usedCase = CONFIG_FILE ? CONFIG_FILE[`component${type}Case`] : 'default';
-
-    // File names can't use kebab-case
-    if (type === 'File' && usedCase === 'kebab-case') throw Errors.INVALID_CASE_NAME_FOR_FILE();
-
-    switch (usedCase) {
-
-        case 'UpperCamelCase': return toUpperCamelCase(name);
-        case 'lowerCamelCase': return toLowerCamelCase(name);
-        case 'kebab-case': return toKebabCase(name);
-        case 'snake_case': return toSnakeCase(name);
-        default: return toUpperCamelCase(name);
-
-    }
-
+const write = ({ title, path, template }) => {
+    fs.writeFile(path, template, err => !err ? Logs.createSuccess(title) : Logs.createFail(title))
 }
 
 /**
- * @param {string} fileName config file options 
- * @param {Object} configOptions config file options 
- * @param {Object} params cmd params
+ * @param {string} fileName
+ * @param {string} foldersPath
  */
 const getFilesToBeCreated = (fileName, foldersPath, params) => {
 
-    const COMPONENT_TYPE = !params.type || (params.type !== 'function' && params.type !== 'class') ? 'class' : params.type;
+    let filesToBeCreated = [];
 
-    const EXTENSIONS = {
-        COMPONENT: (CONFIG_FILE && CONFIG_FILE.usingTypescript) ? '.ts' : '.js',
-        STYLES: CONFIG_FILE ? '.' + CONFIG_FILE.styles : '.css',
-        SPEC: '.spec.js'
+    const COMPONENT_NAME = fileName;
+    const COMPONENT_TYPE = CONFIG_FILE ? CONFIG_FILE.defaults.component.type : 'class';
+    const COMPONENT_EXTENSION = (CONFIG_FILE && CONFIG_FILE.usingTypescript) ? 'ts' : 'js';
+    const STYLES_EXTENSION = CONFIG_FILE ? CONFIG_FILE.styles : 'css';
+    const COMPONENT_HAS_STYLESHEETS = CONFIG_FILE ? CONFIG_FILE.defaults.component.style : true;
+    const COMPONENT_HAS_SPEC_FILE = CONFIG_FILE ? CONFIG_FILE.defaults.component.spec : true;
+    const COMPONENT_TEMPLATE = templateParser(`component-${COMPONENT_TYPE}`, { COMPONENT_NAME, COMPONENT_HAS_STYLESHEETS, STYLES_EXTENSION });
+    const COMPONENT = {
+        title: 'Component',
+        template: COMPONENT_TEMPLATE,
+        extension: COMPONENT_EXTENSION,
+        path: `${process.cwd()}/${foldersPath}/${fileName}.${COMPONENT_EXTENSION}`
+    };
+
+    filesToBeCreated.push(COMPONENT);
+
+    if (COMPONENT_HAS_STYLESHEETS) {
+        const STYLES_TEMPLATE = '';
+        const STYLESHEET = {
+            title: 'Styles',
+            template: STYLES_TEMPLATE,
+            extension: STYLES_EXTENSION,
+            path: `${process.cwd()}/${foldersPath}/${fileName}.${STYLES_EXTENSION}`
+        };
+
+        filesToBeCreated.push(STYLESHEET);
     }
 
-    const TEMPLATES = {
-        COMPONENT: templateParser(
-            fs.readFileSync(`${__dirname}/../templates/component-${COMPONENT_TYPE}`).toString(),
-            { 
-                ComponentName: fileName,
-                UsingCSS: CONFIG_FILE && CONFIG_FILE.styles === 'none' ? false : true,
-                StylesExtension: CONFIG_FILE && CONFIG_FILE.styles ? CONFIG_FILE.styles : 'css'
-            }
-        ),
+    if (COMPONENT_HAS_SPEC_FILE) {
+        const SPEC_FILE_EXTENSION = 'spec.js';
+        const SPEC_FILE_TEMPLATE = templateParser('spec-file', { COMPONENT_NAME: fileName })
+        const SPEC_FILE = {
+            title: 'Tests',
+            template: SPEC_FILE_TEMPLATE,
+            extension: SPEC_FILE_EXTENSION,
+            path: `${process.cwd()}/${foldersPath}/${fileName}.${SPEC_FILE_EXTENSION}`
+        }
 
-        SPEC: templateParser(fs.readFileSync(`${__dirname}/../templates/spec-file`).toString(), { ComponentName: fileName }),
-        STYLES: ''
+        filesToBeCreated.push(SPEC_FILE);
     }
 
-    const FILES = [
-        { title: 'Component', template: TEMPLATES.COMPONENT, extension: EXTENSIONS.COMPONENT, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.COMPONENT}` },
-        { title: 'Styles', template: TEMPLATES.STYLES, extension: EXTENSIONS.STYLES, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.STYLES}` },
-        { title: 'Tests', template: TEMPLATES.SPEC, extension: EXTENSIONS.SPEC, path: `${process.cwd()}/${foldersPath}/${fileName}${EXTENSIONS.SPEC}` }
-    ];
+    filesToBeCreated = filterByInputedParams(filesToBeCreated, params)
 
-    let filesToBeCreated = FILES;
+    return filesToBeCreated;
+
+}
+
+const filterByInputedParams = (files, params) => {
 
     if (params.spec === 'false') {
-        filesToBeCreated = filesToBeCreated.filter(f => f.extension !== EXTENSIONS.SPEC);
+        files = files.filter(f => f.extension !== 'spec.js');
     }
 
     if ((CONFIG_FILE && CONFIG_FILE.styles === 'none') || params.styles === 'false') {
-        filesToBeCreated = filesToBeCreated.filter(f => f.extension !== EXTENSIONS.STYLES);
+        files = files.filter(f => f.extension !== (CONFIG_FILE ? CONFIG_FILE.styles : 'css'));
     }
 
     if (Object.keys(params).includes('simple') || Object.keys(params).includes('s')) {
-        filesToBeCreated = filesToBeCreated.filter(f => f.title === 'Component');
+        files = files.filter(f => f.title === 'Component');
     }
 
-    return filesToBeCreated;
+    return files;
 
 }

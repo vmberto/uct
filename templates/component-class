@@ -1,11 +1,11 @@
 // global
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-<? UsingCSS=?
+<? COMPONENT_HAS_STYLESHEETS=?
 // stylesheets
-import './<$ComponentName$>.<$StylesExtension$>';
+import './<$COMPONENT_NAME$>.<$STYLES_EXTENSION$>';
 ?>
-class <$ComponentName$> extends Component {
+class <$COMPONENT_NAME$> extends Component {
 
     state = {}
 
@@ -17,6 +17,6 @@ class <$ComponentName$> extends Component {
 
 }
 
-<$ComponentName$>.propTypes = {};
+<$COMPONENT_NAME$>.propTypes = {};
 
-export default <$ComponentName$>;
+export default <$COMPONENT_NAME$>;
