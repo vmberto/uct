@@ -1,6 +1,6 @@
 var fs = require('fs');
 var cp = require('child_process');
-var { rimraf, execute } = require('./utils');
+var { rimraf, execute } = require('./test.utils');
 
 describe('UCT INIT - CONFIG FILE', () => {
 

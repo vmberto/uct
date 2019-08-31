@@ -1,5 +1,6 @@
 // global
 const fs = require('fs');
+const path = require('path');
 // lib
 const configFileReader = require('../lib/config-file-reader');
 const Logs = require('../lib/logs');
@@ -9,18 +10,29 @@ const {
     mkdirP,
     getFoldersFromPath,
     getFileNameFromPath,
+    treatNameOf,
 } = require('../utils');
 
 const CONFIG_FILE = configFileReader();
 
-module.exports = (commands, params) => {
+module.exports = (options, args) => {
 
-    const INPUTED_PATH = commands[1];
+    const INPUTED_PATH = options[1];
 
-    const foldersPath = getFoldersFromPath(INPUTED_PATH, CONFIG_FILE ? CONFIG_FILE[`componentFolderCase`] : 'default');
-    const fileName = getFileNameFromPath(INPUTED_PATH, CONFIG_FILE ? CONFIG_FILE[`componentFileCase`] : 'default');
+    let fileName = getFileNameFromPath(INPUTED_PATH);
+    fileName = treatNameOf('File', fileName, CONFIG_FILE ? CONFIG_FILE[`componentFileCase`] : 'default')
 
-    const FILES = getFilesToBeCreated(fileName, foldersPath, params);
+    let foldersPath = getFoldersFromPath(INPUTED_PATH);
+    let folderName = path.basename(foldersPath);
+    foldersPath = path.format({
+        dir: foldersPath === folderName ? '' : foldersPath.replace(folderName, ''),
+        base: treatNameOf('Folder', folderName, CONFIG_FILE ? CONFIG_FILE[`componentFolderCase`] : 'default'),
+    });
+
+    console.log(foldersPath);
+    
+
+    const FILES = getFilesToBeCreated(fileName, foldersPath, args);
 
     mkdirP(foldersPath, () => FILES.forEach(file => write(file)));
 
@@ -39,16 +51,16 @@ const write = ({ title, path, template }) => {
  * @param {string} fileName
  * @param {string} foldersPath
  */
-const getFilesToBeCreated = (fileName, foldersPath, params) => {
+const getFilesToBeCreated = (fileName, foldersPath, args) => {
 
     let filesToBeCreated = [];
-
+    
     const COMPONENT_NAME = fileName;
     const COMPONENT_TYPE = CONFIG_FILE ? CONFIG_FILE.defaults.component.type : 'class';
     const COMPONENT_EXTENSION = (CONFIG_FILE && CONFIG_FILE.usingTypescript) ? 'ts' : 'js';
-    const STYLES_EXTENSION = CONFIG_FILE ? CONFIG_FILE.styles : 'css';
     const COMPONENT_HAS_STYLESHEETS = CONFIG_FILE ? CONFIG_FILE.defaults.component.style : true;
     const COMPONENT_HAS_SPEC_FILE = CONFIG_FILE ? CONFIG_FILE.defaults.component.spec : true;
+    const STYLES_EXTENSION = CONFIG_FILE ? CONFIG_FILE.styles : 'css';
     const COMPONENT_TEMPLATE = templateParser(`component-${COMPONENT_TYPE}`, { COMPONENT_NAME, COMPONENT_HAS_STYLESHEETS, STYLES_EXTENSION });
     const COMPONENT = {
         title: 'Component',
@@ -84,24 +96,20 @@ const getFilesToBeCreated = (fileName, foldersPath, params) => {
         filesToBeCreated.push(SPEC_FILE);
     }
 
-    filesToBeCreated = filterByInputedParams(filesToBeCreated, params)
+    filesToBeCreated = filterByInputedParams(filesToBeCreated, args)
 
     return filesToBeCreated;
 
 }
 
-const filterByInputedParams = (files, params) => {
+const filterByInputedParams = (files, args) => {
 
-    if (params.spec === 'false') {
-        files = files.filter(f => f.extension !== 'spec.js');
+    if (args.includes('--no-spec')) {
+        files = files.filter(f => f.title !== 'Tests');
     }
 
-    if ((CONFIG_FILE && CONFIG_FILE.styles === 'none') || params.styles === 'false') {
-        files = files.filter(f => f.extension !== (CONFIG_FILE ? CONFIG_FILE.styles : 'css'));
-    }
-
-    if (Object.keys(params).includes('simple') || Object.keys(params).includes('s')) {
-        files = files.filter(f => f.title === 'Component');
+    if (args.includes('--no-style')) {
+        files = files.filter(f => f.title !== 'Styles');
     }
 
     return files;

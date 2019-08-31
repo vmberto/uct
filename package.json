@@ -9,7 +9,7 @@
     "uct": "bin/uct"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest --verbose"
   },
   "devDependencies": {
     "jest": "^24.8.0"
