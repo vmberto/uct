@@ -1,7 +1,7 @@
 var fs = require('fs');
 var { rimraf, execute } = require('./test.utils');
 
-describe('CREATE COMPONENT WITH PARAMS', () => {
+describe('CREATE COMPONENT WITH ARGUMENTS', () => {
 
     it('creates a component without tests', () => {
 
@@ -40,8 +40,29 @@ describe('CREATE COMPONENT WITH PARAMS', () => {
 
         rimraf(__dirname + '/Test');
 
-        // component and test files created
         expect(!!component && !!!styles && !!tests).toBeTruthy();
+
+    });
+
+    it('creates a component without a folder', () => {
+
+        execute('uct create test --outside-folder');
+
+        let component, styles, tests;
+
+        try {
+            component = fs.readFileSync(__dirname + '/Test.js');
+            tests = fs.readFileSync(__dirname + '/Test.spec.js');
+            styles = fs.readFileSync(__dirname + '/Test.css');
+        } catch (e) {
+            //
+        }
+
+        fs.unlinkSync(__dirname + '/Test.js');
+        fs.unlinkSync(__dirname + '/Test.spec.js');
+        fs.unlinkSync(__dirname + '/Test.css');
+        
+        expect(!!component && !!styles && !!tests).toBeTruthy();
 
     });
 

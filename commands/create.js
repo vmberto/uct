@@ -8,9 +8,8 @@ const templateParser = require('../lib/template-parser');
 // utils
 const {
     mkdirP,
-    getFoldersFromPath,
-    getFileNameFromPath,
-    treatNameOf,
+    mountFoldersPath,
+    mountFileName,
 } = require('../utils');
 
 const CONFIG_FILE = configFileReader();
@@ -19,20 +18,12 @@ module.exports = (options, args) => {
 
     const INPUTED_PATH = options[1];
 
-    let fileName = getFileNameFromPath(INPUTED_PATH);
-    fileName = treatNameOf('File', fileName, CONFIG_FILE ? CONFIG_FILE[`componentFileCase`] : 'default')
+    let fileName = mountFileName(INPUTED_PATH, CONFIG_FILE);
+    let foldersPath = mountFoldersPath(INPUTED_PATH, args, CONFIG_FILE);
 
-    let foldersPath = getFoldersFromPath(INPUTED_PATH);
-    let folderName = path.basename(foldersPath);
-    foldersPath = path.format({
-        dir: foldersPath === folderName ? '' : foldersPath.replace(folderName, ''),
-        base: treatNameOf('Folder', folderName, CONFIG_FILE ? CONFIG_FILE[`componentFolderCase`] : 'default'),
-    });
+    let FILES = getFilesToBeCreated(fileName, foldersPath);
 
-    console.log(foldersPath);
-    
-
-    const FILES = getFilesToBeCreated(fileName, foldersPath, args);
+    FILES = filterByInputedArgs(FILES, args);
 
     mkdirP(foldersPath, () => FILES.forEach(file => write(file)));
 
@@ -51,13 +42,13 @@ const write = ({ title, path, template }) => {
  * @param {string} fileName
  * @param {string} foldersPath
  */
-const getFilesToBeCreated = (fileName, foldersPath, args) => {
+const getFilesToBeCreated = (fileName, foldersPath) => {
 
     let filesToBeCreated = [];
     
     const COMPONENT_NAME = fileName;
     const COMPONENT_TYPE = CONFIG_FILE ? CONFIG_FILE.defaults.component.type : 'class';
-    const COMPONENT_EXTENSION = (CONFIG_FILE && CONFIG_FILE.usingTypescript) ? 'ts' : 'js';
+    const COMPONENT_EXTENSION = (CONFIG_FILE && CONFIG_FILE.usingTypescript) ? 'tsx' : 'js';
     const COMPONENT_HAS_STYLESHEETS = CONFIG_FILE ? CONFIG_FILE.defaults.component.style : true;
     const COMPONENT_HAS_SPEC_FILE = CONFIG_FILE ? CONFIG_FILE.defaults.component.spec : true;
     const STYLES_EXTENSION = CONFIG_FILE ? CONFIG_FILE.styles : 'css';
@@ -96,13 +87,11 @@ const getFilesToBeCreated = (fileName, foldersPath, args) => {
         filesToBeCreated.push(SPEC_FILE);
     }
 
-    filesToBeCreated = filterByInputedParams(filesToBeCreated, args)
-
     return filesToBeCreated;
 
 }
 
-const filterByInputedParams = (files, args) => {
+const filterByInputedArgs = (files, args) => {
 
     if (args.includes('--no-spec')) {
         files = files.filter(f => f.title !== 'Tests');

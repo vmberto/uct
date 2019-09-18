@@ -30,7 +30,7 @@ module.exports = () => {
                 break;
                 
             default:
-                console.log(Logs.defaultLog());
+                Logs.defaultLog();
                 process.prompt;
         }
 

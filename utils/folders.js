@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const { treatNameOf } = require('./string');
 
 /**
@@ -46,15 +47,20 @@ const mkdirP = (path, callback, position = 0) => {
  * @param {string} p path inputed by user
  * @returns path without filename (folders stack)
  */
-const getFoldersFromPath = (p, nameCase) => {
-    let fullPathArr = p.split('/');
+const mountFoldersPath = (p, args, CONFIG_FILE) => {
+    let folderName = path.basename(p);
+    let foldersPath = path.format({
+        dir: p === folderName ? '' : p.replace(folderName, ''),
+        base: treatNameOf('Folder', folderName, CONFIG_FILE ? CONFIG_FILE[`componentFolderCase`] : 'default'),
+    });
 
-    let folderName = fullPathArr[fullPathArr.length - 1];
-    folderName = treatNameOf('Folder', folderName, nameCase);
-
-    fullPathArr[fullPathArr.length - 1] = folderName;
-
-    return fullPathArr.join('/');
+    if (args.includes('--outside-folder')) {
+        foldersPath = foldersPath.split('/');
+        foldersPath.pop();
+        foldersPath = foldersPath.join('/');
+    }
+    
+    return foldersPath;
 };
 
 /**
@@ -62,10 +68,13 @@ const getFoldersFromPath = (p, nameCase) => {
  * @param {string} p path inputed by user
  * @returns path without folders stack
  */
-const getFileNameFromPath = (p, nameCase) => {
+const mountFileName = (p, CONFIG_FILE) => {
     let fullPathArr = p.split('/');
 
-    let fileName = treatNameOf('File', fullPathArr[fullPathArr.length - 1], nameCase);
+    let fileName = fullPathArr[fullPathArr.length - 1];
+
+    fileName = treatNameOf('File', fileName, CONFIG_FILE ? CONFIG_FILE[`componentFileCase`] : 'default')
+
 
     return fileName;
 };
@@ -73,6 +82,6 @@ const getFileNameFromPath = (p, nameCase) => {
 
 module.exports = {
     mkdirP,
-    getFoldersFromPath,
-    getFileNameFromPath,
+    mountFoldersPath,
+    mountFileName,
 };
