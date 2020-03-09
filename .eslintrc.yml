@@ -11,5 +11,6 @@ parserOptions:
   ecmaVersion: 2018
 rules: {
   semi: 1,
-  no-var: 1
+  no-var: 1,
+  no-console: 1
 }

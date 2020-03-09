@@ -4,7 +4,7 @@ const create = require('./commands/create');
 const init = require('./commands/init');
 
 // commands
-const { CREATE, INIT, HELP } = require('./utils');
+const { CREATE, INIT, HELP } = require('./lib/commands');
 
 module.exports = () => {
 
@@ -12,17 +12,17 @@ module.exports = () => {
 
         const input = new InputHandler();
     
+        const commands = input.commands;
         const args = input.args;
-        const options = input.options;
-    
-        switch (options[0]) {
+
+        switch (commands[0]) {
     
             case CREATE.cmd:
-                create(options, args);
+                create(commands, args);
                 break;
     
             case INIT.cmd:
-                init(options, args);
+                init(commands, args);
                 break;
     
             case HELP.cmd:

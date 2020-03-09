@@ -5,11 +5,12 @@ command line program for manage react projects structure
 
 ### Create Component
 
->uct create component [name]
+>uct create [path/name]
 
-**-t, --type**: Specifies the component type(*class* or *function*).
-Default: *class*
+**--no-styles**: Ignores the styles file
 
-**-s, --spec**: Specifies if a test file is generated.
-Default: *true*
+**--no-spec**: Ignores the component tests file
 
+**--functional**: By default, the generated component is a class, this argument creates as a Function
+
+**--help**: Prints `create` command usability

@@ -1,40 +1,36 @@
-// global
-const fs = require('fs');
 // lib
 const configFileReader = require('../lib/config-file-reader');
 const Logs = require('../lib/logs');
 const templateParser = require('../lib/template-parser');
+const { write } = require ('../lib/file-system');
+const { CREATE } = require ('../lib/commands');
 // utils
 const {
     mkdirP,
     mountFoldersPath,
     mountFileName,
-} = require('../utils');
+} = require('../lib/folders');
 
 const CONFIG_FILE = configFileReader();
 
-module.exports = (options, args) => {
+module.exports = (commands, args) => {
 
-    const INPUTED_PATH = options[1];
+    if (!commands[1] || args.includes('--help')) {
+        Logs.printCreateHelp();
+        return;
+    }
+
+    const INPUTED_PATH = commands[1];
 
     let fileName = mountFileName(INPUTED_PATH, CONFIG_FILE);
     let foldersPath = mountFoldersPath(INPUTED_PATH, args, CONFIG_FILE);
 
     let FILES = getFilesToBeCreated(fileName, foldersPath);
 
-    FILES = filterByInputedArgs(FILES, args);
+    CREATE.args.filter(arg => args.includes(arg.title)).map(a => a.action).forEach(action => action(FILES));
 
     mkdirP(foldersPath, () => FILES.forEach(file => write(file)));
 
-};
-
-/**
- * Writes a file
- * 
- * @param {Object} file   
- */
-const write = ({ title, path, template }) => {
-    fs.writeFile(path, template, err => !err ? Logs.createSuccess(title) : Logs.createFail(title));
 };
 
 /**
@@ -87,19 +83,5 @@ const getFilesToBeCreated = (fileName, foldersPath) => {
     }
 
     return filesToBeCreated;
-
-};
-
-const filterByInputedArgs = (files, args) => {
-
-    if (args.includes('--no-spec')) {
-        files = files.filter(f => f.title !== 'Tests');
-    }
-
-    if (args.includes('--no-style')) {
-        files = files.filter(f => f.title !== 'Styles');
-    }
-
-    return files;
 
 };

@@ -1,10 +1,15 @@
-const fs = require('fs');
-const Logs = require('../lib/logs');
+const { readFile, write } = require('../lib/file-system');
 
 module.exports = () => {
 
-    let template = fs.readFileSync(__dirname + '/../templates/uct-config').toString();
+    let template = readFile('/../templates/uct-config').toString();
 
-    fs.writeFile(process.cwd() + '/uct.js', template, err => !err ? Logs.createSuccess('Config') : Logs.createFail('Config'));
+    const configFile = {
+        title: 'Config',
+        path: `${process.cwd()}/uct.js`,
+        template,
+    };
+
+    write(configFile);
 
 };
