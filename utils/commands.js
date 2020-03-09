@@ -6,17 +6,17 @@ const CREATE = {
         '--no-spec',
         '--no-style'
     ]
-}
+};
 
 const INIT = {
     cmd: 'init',
     args: []
-}
+};
 
 const HELP = {
     cmd: 'help',
     args: []
-}
+};
 
 
 module.exports = {

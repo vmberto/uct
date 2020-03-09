@@ -6,6 +6,8 @@ exports.execute = command => cp.execSync(command, { cwd: __dirname });
 
 exports.changeConfigFile = (currentValue, newValue) => {
 
+    let configFile;
+
     try {
         configFile = fs.readFileSync(__dirname + '/uct.js').toString();
     } catch(e) {
@@ -27,11 +29,11 @@ exports.rimraf = dir_path => {
         fs.readdirSync(dir_path).forEach(entry => {
             const entry_path = path.join(dir_path, entry);
             if (fs.lstatSync(entry_path).isDirectory()) {
-                rimraf(entry_path);
+                this(entry_path);
             } else {
                 fs.unlinkSync(entry_path);
             }
         });
         fs.rmdirSync(dir_path);
     }
-}
+};

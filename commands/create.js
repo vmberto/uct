@@ -1,6 +1,5 @@
 // global
 const fs = require('fs');
-const path = require('path');
 // lib
 const configFileReader = require('../lib/config-file-reader');
 const Logs = require('../lib/logs');
@@ -27,7 +26,7 @@ module.exports = (options, args) => {
 
     mkdirP(foldersPath, () => FILES.forEach(file => write(file)));
 
-}
+};
 
 /**
  * Writes a file
@@ -35,8 +34,8 @@ module.exports = (options, args) => {
  * @param {Object} file   
  */
 const write = ({ title, path, template }) => {
-    fs.writeFile(path, template, err => !err ? Logs.createSuccess(title) : Logs.createFail(title))
-}
+    fs.writeFile(path, template, err => !err ? Logs.createSuccess(title) : Logs.createFail(title));
+};
 
 /**
  * @param {string} fileName
@@ -76,20 +75,20 @@ const getFilesToBeCreated = (fileName, foldersPath) => {
 
     if (COMPONENT_HAS_SPEC_FILE) {
         const SPEC_FILE_EXTENSION = 'spec.js';
-        const SPEC_FILE_TEMPLATE = templateParser('spec-file', { COMPONENT_NAME: fileName })
+        const SPEC_FILE_TEMPLATE = templateParser('spec-file', { COMPONENT_NAME: fileName });
         const SPEC_FILE = {
             title: 'Tests',
             template: SPEC_FILE_TEMPLATE,
             extension: SPEC_FILE_EXTENSION,
             path: `${process.cwd()}/${foldersPath}/${fileName}.${SPEC_FILE_EXTENSION}`
-        }
+        };
 
         filesToBeCreated.push(SPEC_FILE);
     }
 
     return filesToBeCreated;
 
-}
+};
 
 const filterByInputedArgs = (files, args) => {
 
@@ -103,4 +102,4 @@ const filterByInputedArgs = (files, args) => {
 
     return files;
 
-}
+};

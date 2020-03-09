@@ -6,8 +6,8 @@ const Errors = require('../lib/errors');
  * @param {string} str
  */
 const hasJavascriptExtension = str => {
-    return /((([a-zA-Z]+\.)+['js']{2}))$/.test(str)
-}
+    return /((([a-zA-Z]+\.)+['js']{2}))$/.test(str);
+};
 
 /**
  * 
@@ -16,8 +16,8 @@ const hasJavascriptExtension = str => {
  * 
  */
 const isValidComponentName = str => {
-    return /^(?!\d*$)[a-z\d]*$/i.test(str)
-}
+    return /^(?!\d*$)[a-z\d]*$/i.test(str);
+};
 
 /**
  * transform to kebab-case
@@ -74,7 +74,7 @@ const treatNameOf = (type, name, nameCase) => {
 
     }
 
-}
+};
 
 module.exports = {
     hasJavascriptExtension,
@@ -84,4 +84,4 @@ module.exports = {
     toUpperCamelCase,
     toLowerCamelCase,
     treatNameOf,
-}
+};

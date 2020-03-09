@@ -1,5 +1,5 @@
-var fs = require('fs');
-var { execute } = require('./test.utils');
+const fs = require('fs');
+const { execute } = require('./test.utils');
 
 describe('UCT INIT - CONFIG FILE', () => {
 

@@ -1,4 +1,4 @@
-const InputHandler = require('./lib/inputHandler');
+const InputHandler = require('./lib/input-handler');
 const Logs = require('./lib/logs');
 const create = require('./commands/create');
 const init = require('./commands/init');
@@ -26,7 +26,7 @@ module.exports = () => {
                 break;
     
             case HELP.cmd:
-                console.log('Printing Help Info');
+                Logs.print('Printing Help Info');
                 break;
                 
             default:
@@ -38,4 +38,4 @@ module.exports = () => {
         Logs.error(e.message);
     }
 
-}
+};

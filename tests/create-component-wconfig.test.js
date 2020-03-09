@@ -1,5 +1,5 @@
-var fs = require('fs');
-var { rimraf, execute, changeConfigFile } = require('./test.utils');
+const fs = require('fs');
+const { rimraf, execute, changeConfigFile } = require('./test.utils');
 
 describe('CREATE COMPONENT WITH CONFIG FILE OPTIONS', () => {
 
@@ -44,7 +44,7 @@ describe('CREATE COMPONENT WITH CONFIG FILE OPTIONS', () => {
 
         const properlyImportStylesheet = component.toString().search(`import './Test.scss';`) !== -1;
 
-        rimraf(__dirname + '/Test');
+        rimraf(__dirname + '/Test');        
         fs.unlinkSync(__dirname + '/uct.js');
 
         // component, style and test files created

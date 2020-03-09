@@ -6,4 +6,4 @@ module.exports = {
     ...folders,
     ...string,
     ...commands,
-}
+};

@@ -1,5 +1,5 @@
-var fs = require('fs');
-var { rimraf, execute } = require('./test.utils');
+const fs = require('fs');
+const { rimraf, execute } = require('./test.utils');
 
 describe('CREATE COMPONENT WITH ARGUMENTS', () => {
 

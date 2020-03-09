@@ -11,6 +11,7 @@ const { treatNameOf } = require('./string');
  * are given to the completion callback.
  */
 const mkdirP = (path, callback, position = 0) => {
+    let parts;
     if (path[0] === '/') path = path.slice(1, path.length);
     parts = require('path').normalize(path).split('/');
 
@@ -22,7 +23,7 @@ const mkdirP = (path, callback, position = 0) => {
         }
     }
 
-    var directory = parts.slice(0, position + 1).join('/');
+    let directory = parts.slice(0, position + 1).join('/');
     fs.stat(directory, function (err) {
         if (err === null) {
             mkdirP(path, callback, position + 1);
@@ -37,10 +38,10 @@ const mkdirP = (path, callback, position = 0) => {
                 } else {
                     mkdirP(path, callback, position + 1);
                 }
-            })
+            });
         }
-    })
-}
+    });
+};
 
 /**
  * 
@@ -73,7 +74,7 @@ const mountFileName = (p, CONFIG_FILE) => {
 
     let fileName = fullPathArr[fullPathArr.length - 1];
 
-    fileName = treatNameOf('File', fileName, CONFIG_FILE ? CONFIG_FILE[`componentFileCase`] : 'default')
+    fileName = treatNameOf('File', fileName, CONFIG_FILE ? CONFIG_FILE[`componentFileCase`] : 'default');
 
 
     return fileName;
